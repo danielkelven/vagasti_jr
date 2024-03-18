@@ -1,75 +1,70 @@
-from selenium import webdriver
-from selenium.webdriver import ActionChains
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import regex as re
-from time import sleep
+import pandas as pd
+import os
+from get_vagas import BuscarVagas
 
-driver = webdriver.Chrome()
+resultado = BuscarVagas('Júnior')
 
-driver.get("https://portal.gupy.io/")
+dfAcre = resultado[resultado['Local'].str.contains('AC', case=False)]
 
-try:
-    element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, '//*[@id="radix-0"]/div[2]/button'))
-    )
-finally:
-    driver.find_element('xpath','//*[@id="radix-0"]/div[2]/button').click()
+dfAlagoas = resultado[resultado['Local'].str.contains('AL', case=False)]
 
-    driver.find_element('xpath','//*[@id="undefined-input"]').send_keys('Júnior')
+dfAmapa=resultado[resultado['Local'].str.contains('AP', case=False)]
 
-    driver.find_element('xpath','//*[@id="undefined-button"]').click()
+dfAmazonas=resultado[resultado['Local'].str.contains('AM', case=False)]
 
-try:
-    element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div[3]/div/div/aside/form/fieldset[1]/div[3]/label/div[2]'))
-    )
-finally:
-    driver.find_element('xpath','//*[@id="__next"]/div[3]/div/div/aside/form/fieldset[1]/div[3]/label/div[2]').click()
+dfBahia=resultado[resultado['Local'].str.contains('BA', case=False)]
 
-try:
-    element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div[2]/div/p/strong'))
-    )
-finally:
-    total = driver.find_element('xpath','//*[@id="__next"]/div[2]/div/p/strong').get_property('textContent')
+dfCeara=resultado[resultado['Local'].str.contains('CE', case=False)]
 
-    vagas = driver.find_element('xpath','//*[@id="__next"]/div[3]/div/div/main/ul').get_property('childElementCount')
+dfEspiritoSanto=resultado[resultado['Local'].str.contains('ES', case=False)]
 
-    total = re.findall("^\d{1,}",total)
-    total = int(total[0])
+dfGoias=resultado[resultado['Local'].str.contains('GO', case=False)]
 
-    while vagas < total:
-        scroll_origin = ScrollOrigin.from_viewport(10, 10)
-        ActionChains(driver)\
-            .scroll_from_origin(scroll_origin, 0, 200)\
-            .perform()
-        vagas = driver.find_element('xpath','//*[@id="__next"]/div[3]/div/div/main/ul').get_property('childElementCount')
+dfMaranhao=resultado[resultado['Local'].str.contains('MA', case=False)]
 
-    vagas = driver.find_element('xpath','//*[@id="__next"]/div[3]/div/div/main/ul')
+dfMatoGrosso=resultado[resultado['Local'].str.contains('MT', case=False)]
 
-    all_li = vagas.find_elements(By.TAG_NAME,'li')
-    for li in all_li:
-        print('Link: ',li.find_element(By.TAG_NAME,'a').get_property('href'))
-        li = re.split('\n',li.text)
-        print('Empresa: ',li[0])
-        print('Posição: ',li[1])
-        print('Local: ',li[2])
-        print('Modelo: ',li[3])
-        print('Contrato: ',li[4])
-        print(li[5])
-        if len(li) == 7:
-            print(li[6])
-        print('--------------------------------------------------------------')
+dfMGSul=resultado[resultado['Local'].str.contains('MS', case=False)]
+
+dfMinasGerais=resultado[resultado['Local'].str.contains('MG', case=False)]
+
+dfPara=resultado[resultado['Local'].str.contains('PA', case=False)]
+
+dfParaiba=resultado[resultado['Local'].str.contains('PB', case=False)]
+
+dfParana=resultado[resultado['Local'].str.contains('PR', case=False)]
+
+dfPernambuco=resultado[resultado['Local'].str.contains('PE', case=False)]
+
+dfPiaui=resultado[resultado['Local'].str.contains('PI', case=False)]
+
+dfRioJaneiro=resultado[resultado['Local'].str.contains('RJ', case=False)]
+
+dfRGNorte=resultado[resultado['Local'].str.contains('RN', case=False)]
+
+dfGSul=resultado[resultado['Local'].str.contains('RS', case=False)]
+
+dfRondonia=resultado[resultado['Local'].str.contains('RO', case=False)]
+
+dfRoraima=resultado[resultado['Local'].str.contains('RR', case=False)]
+
+dfSantaCatarina=resultado[resultado['Local'].str.contains('SC', case=False)]
+
+dfSaoPaulo=resultado[resultado['Local'].str.contains('SP', case=False)]
+
+dfSergipe=resultado[resultado['Local'].str.contains('SE', case=False)]
+
+dfTocantins=resultado[resultado['Local'].str.contains('TO', case=False)]
+
+dfDistritoFederal=resultado[resultado['Local'].str.contains('DF', case=False)]
 
 
+# if os.path.exists('files/dimensionamento_final.xlsx'):
+#     os.remove('files/dimensionamento_final.xlsx')
 
-    # print('Posição: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$jdccrmqv3e')['children']['props']['data']['jobName'])
-    # print('Empresa: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$0tuklue9ikrd')['children']['props']['data']['careerPageName'])
-    # print('Logo: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$0tuklue9ikrd')['children']['props']['data']['careerPageUrlLogo'])
-    # print('Descrição: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$0tuklue9ikrd')['children']['props']['data']['description'])
-    # print('Vaga: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$0tuklue9ikrd')['children']['props']['data']['jobType'])
-    # print('Publicação: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$0tuklue9ikrd')['children']['props']['data']['publishedDate'])
-    # print('Modelo: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$0tuklue9ikrd')['children']['props']['data']['workplaceType'])
+# with pd.ExcelWriter('files/Resumo vagas Júnior.xlsx') as arquivoFinal:
+#     df_plast.to_excel(arquivoFinal, sheet_name='PLAST', index=False)
+#     df_full.to_excel(arquivoFinal, sheet_name='FULL', index=False)
+#     df_exp.to_excel(arquivoFinal, sheet_name='EXP', index=False)
+#     df_f5.to_excel(arquivoFinal, sheet_name='F5', index=False)
+#     df_ts.to_excel(arquivoFinal, sheet_name='TS', index=False)

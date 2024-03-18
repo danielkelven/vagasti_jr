@@ -1,0 +1,7 @@
+ # print('Posição: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$jdccrmqv3e')['children']['props']['data']['jobName'])
+    # print('Empresa: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$0tuklue9ikrd')['children']['props']['data']['careerPageName'])
+    # print('Logo: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$0tuklue9ikrd')['children']['props']['data']['careerPageUrlLogo'])
+    # print('Descrição: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$0tuklue9ikrd')['children']['props']['data']['description'])
+    # print('Vaga: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$0tuklue9ikrd')['children']['props']['data']['jobType'])
+    # print('Publicação: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$0tuklue9ikrd')['children']['props']['data']['publishedDate'])
+    # print('Modelo: ',li.find_element(By.TAG_NAME,'a').get_property('__reactProps$0tuklue9ikrd')['children']['props']['data']['workplaceType'])
