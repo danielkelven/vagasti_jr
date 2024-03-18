@@ -24,12 +24,12 @@ def BuscarVagas(palavraChave:str):
 
         browser.find_element('xpath','//*[@id="undefined-button"]').click()
 
-    # try:
-    #     element = WebDriverWait(browser, 10).until(
-    #         EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div[3]/div/div/aside/form/fieldset[1]/div[3]/label/div[2]'))
-    #     )
-    # finally:
-    #     browser.find_element('xpath','//*[@id="__next"]/div[3]/div/div/aside/form/fieldset[1]/div[3]/label/div[2]').click()
+    try:
+        element = WebDriverWait(browser, 10).until(
+            EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div[3]/div/div/aside/form/fieldset[1]/div[3]/label/div[2]'))
+        )
+    finally:
+        browser.find_element('xpath','//*[@id="__next"]/div[3]/div/div/aside/form/fieldset[1]/div[3]/label/div[2]').click()
 
     try:
         element = WebDriverWait(browser, 10).until(
@@ -81,5 +81,8 @@ def BuscarVagas(palavraChave:str):
         baseArray = [ast.literal_eval(linha) for linha in strArray.split('\n')]
         
         dfGeral = pd.DataFrame(baseArray, columns=['Empresa', 'Cargo', 'Local', 'Modalidade', 'Tipo de Vaga', 'Acessível para PCD', 'Publicada em', 'Link'])
+
+        for termo in ['Infraestrutura','Develop','Desenvolv','Suporte','Informática','Implantação','Front','Back','Cloud','Devops','Redes','Sistemas']:
+            dfGeral = dfGeral[dfGeral['Cargo'].str.contains(termo,case=False)]
 
         return dfGeral
