@@ -1,18 +1,13 @@
 import pandas as pd
-import os
 from get_vagas import BuscarVagas
 
 resultado = BuscarVagas('Júnior')
 
-print(resultado)
+dados = pd.DataFrame(resultado)
 
+# termos = ['Infraestrutura','Develop','Desenvolv','Suporte','Informática','Implantação','Front','Back','Cloud','Devops','Redes','Sistema']
 
-# if os.path.exists('files/dimensionamento_final.xlsx'):
-#     os.remove('files/dimensionamento_final.xlsx')
+# for row in dados.iterrows():
+#     for termo in termos:
 
-# with pd.ExcelWriter('files/Resumo vagas Júnior.xlsx') as arquivoFinal:
-#     df_plast.to_excel(arquivoFinal, sheet_name='PLAST', index=False)
-#     df_full.to_excel(arquivoFinal, sheet_name='FULL', index=False)
-#     df_exp.to_excel(arquivoFinal, sheet_name='EXP', index=False)
-#     df_f5.to_excel(arquivoFinal, sheet_name='F5', index=False)
-#     df_ts.to_excel(arquivoFinal, sheet_name='TS', index=False)
+# dados.to_excel("dados_jr.xlsx")

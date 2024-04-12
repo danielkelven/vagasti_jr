@@ -1,15 +1,15 @@
 from selenium import webdriver
-from selenium.webdriver import ActionChains
+from selenium.webdriver import ActionChains, Keys
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.actions.wheel_input import ScrollOrigin
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import regex as re
 import pandas as pd
-import ast
 
 def BuscarVagas(palavraChave:str):
     browser = webdriver.Chrome()
+    
+    browser.maximize_window()
 
     browser.get("https://portal.gupy.io/")
 
@@ -18,71 +18,61 @@ def BuscarVagas(palavraChave:str):
             EC.presence_of_element_located((By.XPATH, '//*[@id="radix-0"]/div[2]/button'))
         )
     finally:
-        browser.find_element('xpath','//*[@id="radix-0"]/div[2]/button').click()
+        browser.find_element(By.XPATH,'//*[@id="radix-0"]/div[2]/button').click()
 
-        browser.find_element('xpath','//*[@id="undefined-input"]').send_keys(palavraChave)
+        browser.find_element(By.XPATH,'//*[@id="undefined-input"]').send_keys(palavraChave)
 
-        browser.find_element('xpath','//*[@id="undefined-button"]').click()
+        browser.find_element(By.XPATH,'//*[@id="undefined-button"]').click()
 
     try:
         element = WebDriverWait(browser, 10).until(
             EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div[3]/div/div/aside/form/fieldset[1]/div[3]/label/div[2]'))
         )
     finally:
-        browser.find_element('xpath','//*[@id="__next"]/div[3]/div/div/aside/form/fieldset[1]/div[3]/label/div[2]').click()
+        browser.find_element(By.XPATH,'//*[@id="__next"]/div[3]/div/div/aside/form/fieldset[1]/div[3]/label/div[2]').click()
 
     try:
         element = WebDriverWait(browser, 10).until(
-            EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div[2]/div/p/strong'))
+            EC.presence_of_element_located((By.XPATH,'//*[@id="__next"]/div[2]/div/p/strong'))
         )
     finally:
-        totalVagas = browser.find_element('xpath','//*[@id="__next"]/div[2]/div/p/strong').get_property('textContent')
-
+        def totalVagas():
+            listVagas = browser.find_element(By.XPATH,'//*[@id="__next"]/div[2]/div/p/strong').get_property('textContent')
+            listVagas = re.findall("^\d{1,}",listVagas)
+            count = int(listVagas[0])
+            return count
+        
     try:
         element = WebDriverWait(browser, 10).until(
-            EC.presence_of_element_located((By.XPATH, '//*[@id="__next"]/div[3]/div/div/main/ul'))
+            EC.presence_of_element_located((By.XPATH, '//*[@id="main-content"]/ul'))
         )
     finally:
-        vagasCarregadas = browser.find_element('xpath','//*[@id="__next"]/div[3]/div/div/main/ul').get_property('childElementCount')
+        def vagasCarregadas():
+            count = browser.find_element(By.XPATH,'//*[@id="main-content"]/ul').get_property('childElementCount')
+            return count
 
-        totalVagas = re.findall("^\d{1,}",totalVagas)
-        totalVagas = int(totalVagas[0])
-
-        while vagasCarregadas < totalVagas:
-            scroll_origin = ScrollOrigin.from_viewport(10, 10)
+        while vagasCarregadas() < totalVagas():
             ActionChains(browser)\
-                .scroll_from_origin(scroll_origin, 0, 200)\
+                .key_down(Keys.CONTROL)\
+                .key_down(Keys.END)\
                 .perform()
-            vagasCarregadas = browser.find_element('xpath','//*[@id="__next"]/div[3]/div/div/main/ul').get_property('childElementCount')
 
-        gridVagas = browser.find_element('xpath','//*[@id="__next"]/div[3]/div/div/main/ul')
+        gridVagas = browser.find_element(By.XPATH,'//*[@id="main-content"]/ul')
 
-        vagas = gridVagas.find_elements(By.TAG_NAME,'li')
-        
-        strArray = ''
+        vagas = gridVagas.find_elements(By.XPATH,'//*[@id="main-content"]/ul/li')
 
-        for vaga in vagas:
-            dadosVaga = re.split('\n',vaga.text)
-            if len(dadosVaga) == 7:
-                if strArray == '':
-                    strArray = "['" + str(dadosVaga).replace("\n",",'") + ",'" + str(vaga.find_element(By.TAG_NAME,'a').get_property('href')) + "']\n"
-                else:
-                    strArray = strArray + "\n['" + str(dadosVaga).replace("\n","','") + ",'" + str(vaga.find_element(By.TAG_NAME,'a').get_property('href')) + "']"
+        baseArray = []
+
+        for i in vagas:
+            link = str(i.find_element(By.TAG_NAME,'a').get_property('href'))
+            vaga = i.text.split('\n')
+            if len(vaga) == 7:
+                vaga.append(link)
             else:
-                if strArray == '':
-                    strArray = "['" + str(dadosVaga).replace("\n",",'") + ",'Não informado'," + ",'" + str(vaga.find_element(By.TAG_NAME,'a').get_property('href')) + "']\n"
-                else:
-                    strArray = strArray + "\n['" + str(dadosVaga).replace("\n","','") + ",'Não informado'," + ",'" + str(vaga.find_element(By.TAG_NAME,'a').get_property('href')) + "']"
+                vaga.insert(5,"Não informado")
+                vaga.append(link)
+            baseArray.append(vaga)
         
-        strArray = strArray.replace("['['","['")
-        strArray = strArray.replace("'],'https","','https")
-        strArray = strArray.replace("\n\n","\n")
-
-        baseArray = [ast.literal_eval(linha) for linha in strArray.split('\n')]
-        
-        dfGeral = pd.DataFrame(baseArray, columns=['Empresa', 'Cargo', 'Local', 'Modalidade', 'Tipo de Vaga', 'Acessível para PCD', 'Publicada em', 'Link'])
-
-        for termo in ['Infraestrutura','Develop','Desenvolv','Suporte','Informática','Implantação','Front','Back','Cloud','Devops','Redes','Sistemas']:
-            dfGeral = dfGeral[dfGeral['Cargo'].str.contains(termo,case=False)]
+        dfGeral = pd.DataFrame(baseArray, columns=['Empresa', 'Cargo', 'Local', 'Modalidade', 'Tipo', 'Acessivel', 'Publicacao', 'Link'])
 
         return dfGeral
