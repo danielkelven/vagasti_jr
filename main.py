@@ -1,13 +1,16 @@
 import pandas as pd
 from get_vagas import BuscarVagas
 
-resultado = BuscarVagas('Júnior')
+# load the jobs
+loadJobs = BuscarVagas()
+loadedJobs = pd.DataFrame(loadJobs)
 
-dados = pd.DataFrame(resultado)
+# export the loaded jobs without filters
+loadedJobs.to_excel("listaCompleta.xlsx",index=False)
 
-# termos = ['Infraestrutura','Develop','Desenvolv','Suporte','Informática','Implantação','Front','Back','Cloud','Devops','Redes','Sistema']
+# keywords to extract the main jobs
+keywords = ['Service Now','Compliance','Quality Assurance','Informação','Software','Programador','Infraestrutura','SAP','Agile','Governança','Requisitos','Teste','QA','DevOps','Developer','Desenvolvedor','Suporte','Informática','Implantação','Front','Back','Cloud','Desenvolvimento','Redes','Sistema']
+filteredDf = loadedJobs[loadedJobs['JobTitle'].str.contains('|'.join(keywords),case=False)]
 
-# for row in dados.iterrows():
-#     for termo in termos:
-
-# dados.to_excel("dados_jr.xlsx")
+# export the loaded and filtered jobs
+filteredDf.to_excel("listaFiltrada.xlsx",index=False)
