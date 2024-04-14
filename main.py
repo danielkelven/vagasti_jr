@@ -1,29 +1,25 @@
 import pandas as pd
-from getJobs import BuscarVagas
+from getVagas import BuscarVagas
 import subprocess
 import time
-
-def exeMain():
-    # load the jobs
-    loadJobs = BuscarVagas()
-    loadedJobs = pd.DataFrame(loadJobs)
-
-    # export the loaded jobs without filters
-    loadedJobs.to_excel("listaCompleta.xlsx",index=False)
-
-    # keywords to extract the main jobs
-    keywords = ['Service Now','Compliance','Quality Assurance','Informação','Software','Programador','Infraestrutura','SAP','Agile','Governança','Requisitos','Teste','QA','DevOps','Developer','Desenvolvedor','Suporte','Informática','Implantação','Front','Back','Cloud','Desenvolvimento','Redes','Sistema']
-    filteredDf = loadedJobs[loadedJobs['JobTitle'].str.contains('|'.join(keywords),case=False)]
-
-    # export the loaded and filtered jobs
-    filteredDf.to_excel("listaFiltrada.xlsx",index=False)
-    
-exeMain()
-
-# specify the path to the file you want to open
-filePath = "listaFiltrada.xlsx"
-
-# open the file with its associated application and wait until it's closed
-subprocess.Popen(['start', filePath], shell=True).wait()
-
+# Carrega as vagas
+carregarVagas1 = BuscarVagas('Júnior')
+lista1 = pd.DataFrame(carregarVagas1)
+# Carrega as vagas
+carregarVagas2 = BuscarVagas('Jr')
+lista2 = pd.DataFrame(carregarVagas2)
+listaCompleta = pd.concat([lista1, lista2],ignore_index=True)
+# Exporta os dados gerados para Excel
+listaCompleta.to_excel("ListaCompleta.xlsx",index=False)
+# Palavras-chave para extrair os dados
+termos = ['Service Now','Compliance','Quality Assurance','Informação','Software','Programador','Infraestrutura','SAP','Agile','Governança','Requisitos','Teste','QA','DevOps','Developer','Desenvolvedor','Suporte','Informática','Implantação','Front','Back','Cloud','Desenvolvimento','Redes','Sistema']
+# Aplica o filtro das palavras chaves
+vagasFiltradasDf = listaCompleta[listaCompleta['Cargo'].str.contains('|'.join(termos),case=False)]
+# Exporta as vagas para o Excel
+vagasFiltradasDf.to_excel("ListaFiltrada.xlsx",index=False)
+# Especifica o caminho do arquivo Excel
+caminhoArquivo = "ListaFiltrada.xlsx"
+# Abre o arquivo no Excel
+subprocess.Popen(['start',caminhoArquivo],shell=True).wait()
+# Aguarda para fechar o arquivo
 time.sleep(30000)
